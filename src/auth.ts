@@ -4,6 +4,20 @@ import bcrypt from "bcryptjs";
 import { getTable } from "@/lib/airtable";
 import type { UserRole } from "@/lib/auth-types";
 
+// Types that are allowed to log in
+const MEMBER_TYPES = ["Athlete", "Technical Official", "Coach"];
+const CLUB_ADMIN_TYPES = ["Club Manager", "Brand Manager"];
+const ADMIN_TYPES = ["Admin"];
+const BLOCKED_TYPES = ["Parent / Guardian / Family", "Other"];
+
+function mapTypeToRole(type: string | undefined): UserRole | null {
+  if (!type || BLOCKED_TYPES.includes(type)) return null;
+  if (ADMIN_TYPES.includes(type)) return "nf_admin";
+  if (CLUB_ADMIN_TYPES.includes(type)) return "club_admin";
+  if (MEMBER_TYPES.includes(type)) return "member";
+  return null;
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
@@ -40,13 +54,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             : storedPassword === password;
           if (!isValid) return null;
 
+          const role = mapTypeToRole(record.get("Type") as string | undefined);
+          if (!role) return null; // Type not allowed to log in
+
           return {
             id: record.id,
             email: record.get("Email") as string,
             name: `${record.get("First Name") || ""} ${record.get("Last Name") || ""}`.trim(),
-            role: (record.get("Role") as UserRole) || "member",
+            role,
             clubId: (record.get("Club") as string[] | undefined)?.[0] || undefined,
-            countryId: (record.get("Country") as string[] | undefined)?.[0] || undefined,
           };
         } catch (error) {
           console.error("Auth error:", error);

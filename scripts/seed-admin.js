@@ -79,7 +79,7 @@ async function main() {
         "Last Name": "User",
         Email: email.toLowerCase(),
         Password: hash,
-        Role: role,
+        Type: role === "nf_admin" ? "Admin" : role === "club_admin" ? "Club Manager" : "Athlete",
       },
     },
   ]);

@@ -5,7 +5,10 @@ import { getTable } from "@/lib/airtable";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { firstName, lastName, email, password, clubId } = body;
+    const { firstName, lastName, email, password, type, clubId } = body;
+
+    const ALLOWED_TYPES = ["Athlete", "Technical Official", "Coach"];
+    const memberType = ALLOWED_TYPES.includes(type) ? type : "Athlete";
 
     if (!firstName || !lastName || !email || !password) {
       return NextResponse.json(
@@ -36,7 +39,7 @@ export async function POST(request: NextRequest) {
       "Last Name": lastName.trim(),
       "Email": email.toLowerCase().trim(),
       "Password": await bcrypt.hash(password, 12),
-      "Role": "member",
+      "Type": memberType,
     };
 
     if (clubId) {

@@ -12,6 +12,7 @@ export default function RegisterPage() {
     email: "",
     password: "",
     confirmPassword: "",
+    type: "Athlete",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -46,6 +47,7 @@ export default function RegisterPage() {
           lastName: form.lastName,
           email: form.email,
           password: form.password,
+          type: form.type,
         }),
       });
 
@@ -110,6 +112,18 @@ export default function RegisterPage() {
                   className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">I am a...</label>
+              <select
+                value={form.type}
+                onChange={(e) => update("type", e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="Athlete">Athlete</option>
+                <option value="Technical Official">Technical Official</option>
+                <option value="Coach">Coach</option>
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
