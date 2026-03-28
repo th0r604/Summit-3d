@@ -1,191 +1,105 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
+import StatsCard from "@/components/StatsCard";
+import Link from "next/link";
 
-interface AirtableRecord {
-  id: string;
-  fields: Record<string, unknown>;
-  createdTime: string;
+interface Stats {
+  members: number;
+  athletes: number;
+  clubs: number;
+  events: number;
+  volunteers: number;
+  technicalOfficials: number;
 }
 
-export default function Home() {
-  const [records, setRecords] = useState<AirtableRecord[]>([]);
+export default function Dashboard() {
+  const [stats, setStats] = useState<Stats>({
+    members: 0,
+    athletes: 0,
+    clubs: 0,
+    events: 0,
+    volunteers: 0,
+    technicalOfficials: 0,
+  });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editFields, setEditFields] = useState<string>("");
-  const [newFields, setNewFields] = useState<string>('{"Name": ""}');
-
-  const fetchRecords = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/records");
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      setRecords(data.records);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to load records");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
   useEffect(() => {
-    fetchRecords();
-  }, [fetchRecords]);
-
-  async function createRecord() {
-    try {
-      const fields = JSON.parse(newFields);
-      const res = await fetch("/api/records", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fields }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      setNewFields('{"Name": ""}');
-      fetchRecords();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to create record");
+    async function fetchStats() {
+      try {
+        const endpoints = ["members", "athletes", "clubs", "events", "volunteers", "technical-officials"];
+        const results = await Promise.allSettled(
+          endpoints.map((e) => fetch(`/api/${e}`).then((r) => r.json()))
+        );
+        setStats({
+          members: results[0].status === "fulfilled" ? results[0].value.records?.length ?? 0 : 0,
+          athletes: results[1].status === "fulfilled" ? results[1].value.records?.length ?? 0 : 0,
+          clubs: results[2].status === "fulfilled" ? results[2].value.records?.length ?? 0 : 0,
+          events: results[3].status === "fulfilled" ? results[3].value.records?.length ?? 0 : 0,
+          volunteers: results[4].status === "fulfilled" ? results[4].value.records?.length ?? 0 : 0,
+          technicalOfficials: results[5].status === "fulfilled" ? results[5].value.records?.length ?? 0 : 0,
+        });
+      } catch {
+        // Stats will show 0 on error
+      } finally {
+        setLoading(false);
+      }
     }
-  }
+    fetchStats();
+  }, []);
 
-  async function updateRecord(id: string) {
-    try {
-      const fields = JSON.parse(editFields);
-      const res = await fetch(`/api/records/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fields }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      setEditingId(null);
-      fetchRecords();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to update record");
-    }
-  }
-
-  async function deleteRecord(id: string) {
-    if (!confirm("Delete this record?")) return;
-    try {
-      const res = await fetch(`/api/records/${id}`, { method: "DELETE" });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      fetchRecords();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to delete record");
-    }
-  }
-
-  function startEdit(record: AirtableRecord) {
-    setEditingId(record.id);
-    setEditFields(JSON.stringify(record.fields, null, 2));
-  }
+  const QUICK_ACTIONS = [
+    { href: "/members", label: "Add Member", section: "Members" },
+    { href: "/athletes", label: "Add Athlete", section: "Athletes" },
+    { href: "/clubs", label: "Add Club", section: "Clubs" },
+    { href: "/events", label: "Create Event", section: "Events" },
+    { href: "/volunteers", label: "Assign Volunteer", section: "Volunteers" },
+    { href: "/technical-officials", label: "Add Official", section: "Officials" },
+  ];
 
   return (
-    <main className="max-w-4xl mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-8">Summit 3D — Airtable Dashboard</h1>
+    <div className="p-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <p className="text-gray-500 mt-1">Canadian Functional Fitness Federation</p>
+      </div>
 
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-6">
-          {error}
-          <button onClick={() => setError(null)} className="ml-4 underline">
-            Dismiss
-          </button>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <StatsCard label="Members" value={loading ? "..." : stats.members} color="blue" />
+        <StatsCard label="Athletes" value={loading ? "..." : stats.athletes} color="green" />
+        <StatsCard label="Clubs" value={loading ? "..." : stats.clubs} color="purple" />
+        <StatsCard label="Events" value={loading ? "..." : stats.events} color="orange" />
+        <StatsCard label="Volunteers" value={loading ? "..." : stats.volunteers} color="blue" />
+        <StatsCard label="Officials" value={loading ? "..." : stats.technicalOfficials} color="green" />
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-white rounded-lg border p-6 mb-8">
+        <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {QUICK_ACTIONS.map((action) => (
+            <Link
+              key={action.href}
+              href={action.href}
+              className="block text-center bg-gray-50 hover:bg-blue-50 border rounded-lg p-4 transition"
+            >
+              <p className="font-medium text-sm">{action.label}</p>
+              <p className="text-xs text-gray-500 mt-1">{action.section}</p>
+            </Link>
+          ))}
         </div>
-      )}
+      </div>
 
-      {/* Create Record */}
-      <section className="mb-8 bg-white p-6 rounded-lg shadow-sm border">
-        <h2 className="text-xl font-semibold mb-4">Create Record</h2>
-        <textarea
-          value={newFields}
-          onChange={(e) => setNewFields(e.target.value)}
-          className="w-full border rounded-lg p-3 font-mono text-sm mb-3 h-24"
-          placeholder='{"Name": "Example", "Status": "Active"}'
-        />
-        <button
-          onClick={createRecord}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
-        >
-          Create
-        </button>
-      </section>
-
-      {/* Records List */}
-      <section className="bg-white p-6 rounded-lg shadow-sm border">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Records</h2>
-          <button
-            onClick={fetchRecords}
-            className="text-blue-600 hover:underline text-sm"
-          >
-            Refresh
-          </button>
+      {/* Setup Guide */}
+      <div className="bg-white rounded-lg border p-6">
+        <h2 className="text-lg font-semibold mb-4">Setup Guide</h2>
+        <div className="space-y-3 text-sm text-gray-600">
+          <p>1. Add your <code className="bg-gray-100 px-1.5 py-0.5 rounded">AIRTABLE_BASE_ID</code> and <code className="bg-gray-100 px-1.5 py-0.5 rounded">AIRTABLE_TABLE_NAME</code> to <code className="bg-gray-100 px-1.5 py-0.5 rounded">.env.local</code></p>
+          <p>2. Create the following tables in your Airtable base: <strong>Members</strong>, <strong>Athletes</strong>, <strong>Clubs</strong>, <strong>Events</strong>, <strong>Volunteers</strong>, <strong>Technical Officials</strong>, <strong>TO Training</strong>, <strong>TO Experience</strong></p>
+          <p>3. Start adding data through the dashboard or directly in Airtable</p>
         </div>
-
-        {loading ? (
-          <p className="text-gray-500">Loading...</p>
-        ) : records.length === 0 ? (
-          <p className="text-gray-500">No records found. Create one above or check your .env.local configuration.</p>
-        ) : (
-          <div className="space-y-4">
-            {records.map((record) => (
-              <div key={record.id} className="border rounded-lg p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <code className="text-xs text-gray-400">{record.id}</code>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => startEdit(record)}
-                      className="text-sm text-blue-600 hover:underline"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => deleteRecord(record.id)}
-                      className="text-sm text-red-600 hover:underline"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-
-                {editingId === record.id ? (
-                  <div>
-                    <textarea
-                      value={editFields}
-                      onChange={(e) => setEditFields(e.target.value)}
-                      className="w-full border rounded-lg p-3 font-mono text-sm mb-3 h-32"
-                    />
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => updateRecord(record.id)}
-                        className="bg-green-600 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-green-700"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => setEditingId(null)}
-                        className="bg-gray-200 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-300"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <pre className="text-sm bg-gray-50 p-3 rounded overflow-auto">
-                    {JSON.stringify(record.fields, null, 2)}
-                  </pre>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-    </main>
+      </div>
+    </div>
   );
 }

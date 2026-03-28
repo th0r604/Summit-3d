@@ -10,12 +10,21 @@ if (!process.env.AIRTABLE_BASE_ID) {
 const airtable = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY });
 const base = airtable.base(process.env.AIRTABLE_BASE_ID);
 
-export function getTable(tableName?: string) {
-  const name = tableName || process.env.AIRTABLE_TABLE_NAME;
-  if (!name) {
-    throw new Error("No table name provided and AIRTABLE_TABLE_NAME is not set");
-  }
-  return base(name);
+export const TABLE_NAMES = {
+  members: process.env.AIRTABLE_TABLE_MEMBERS || "Members",
+  athletes: process.env.AIRTABLE_TABLE_ATHLETES || "Athletes",
+  clubs: process.env.AIRTABLE_TABLE_CLUBS || "Clubs",
+  events: process.env.AIRTABLE_TABLE_EVENTS || "Events",
+  volunteers: process.env.AIRTABLE_TABLE_VOLUNTEERS || "Volunteers",
+  technicalOfficials: process.env.AIRTABLE_TABLE_TOS || "Technical Officials",
+  toTraining: process.env.AIRTABLE_TABLE_TO_TRAINING || "TO Training",
+  toExperience: process.env.AIRTABLE_TABLE_TO_EXPERIENCE || "TO Experience",
+} as const;
+
+export type TableKey = keyof typeof TABLE_NAMES;
+
+export function getTable(tableKey: TableKey) {
+  return base(TABLE_NAMES[tableKey]);
 }
 
 export { base };
