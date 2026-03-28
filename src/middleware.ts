@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 export default auth((req) => {
   const { pathname } = req.nextUrl;
 
-  // Public routes — no auth needed
   if (
     pathname.startsWith("/login") ||
     pathname.startsWith("/register") ||
@@ -15,7 +14,6 @@ export default auth((req) => {
 
   const user = req.auth?.user as Record<string, unknown> | undefined;
 
-  // Not authenticated — redirect to login
   if (!user) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
@@ -24,34 +22,20 @@ export default auth((req) => {
 
   const role = (user.role as string) || "member";
 
-  // Route access rules
-  const adminRoutes = [
+  const nfAdminRoutes = [
     "/people", "/stripe", "/managers", "/board", "/committees",
     "/resources", "/memberships", "/surveys", "/inventory",
-    "/news", "/coaches",
+    "/news", "/coaches", "/clubs", "/technical-officials",
+    "/to-training", "/courses", "/if3-sync", "/circle21",
   ];
-  const nfRoutes = [
-    "/clubs", "/technical-officials", "/to-training", "/courses",
-  ];
-  const clubRoutes = ["/club"];
-  const ifRoutes = ["/federation"];
 
-  // IF admin routes
-  if (ifRoutes.some((r) => pathname.startsWith(r))) {
-    if (role !== "if_admin") {
+  if (nfAdminRoutes.some((r) => pathname.startsWith(r))) {
+    if (role !== "nf_admin") {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
   }
 
-  // NF admin routes (nf_admin + if_admin)
-  if (adminRoutes.some((r) => pathname.startsWith(r)) || nfRoutes.some((r) => pathname.startsWith(r))) {
-    if (role !== "nf_admin" && role !== "if_admin") {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
-    }
-  }
-
-  // Club admin routes (club_admin + nf_admin + if_admin)
-  if (clubRoutes.some((r) => pathname.startsWith(r))) {
+  if (pathname.startsWith("/club")) {
     if (role === "member") {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }

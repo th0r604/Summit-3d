@@ -9,7 +9,7 @@
  * Example:
  *   node scripts/seed-admin.js admin@cf3.ca mypassword nf_admin
  *
- * Roles: if_admin, nf_admin, club_admin, member
+ * Roles: nf_admin, club_admin, member
  *
  * Requires AIRTABLE_API_KEY and AIRTABLE_BASE_ID in .env.local
  */
@@ -40,11 +40,11 @@ const [, , email, password, role = "nf_admin"] = process.argv;
 
 if (!email || !password) {
   console.error("Usage: node scripts/seed-admin.js <email> <password> [role]");
-  console.error("Roles: if_admin, nf_admin, club_admin, member");
+  console.error("Roles: nf_admin, club_admin, member");
   process.exit(1);
 }
 
-const validRoles = ["if_admin", "nf_admin", "club_admin", "member"];
+const validRoles = ["nf_admin", "club_admin", "member"];
 if (!validRoles.includes(role)) {
   console.error(`Invalid role "${role}". Must be one of: ${validRoles.join(", ")}`);
   process.exit(1);
