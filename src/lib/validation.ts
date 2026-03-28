@@ -6,8 +6,8 @@ function checkRequired(fields: Record<string, unknown>, required: string[]): str
     .map((key) => `${key} is required`);
 }
 
-export function validateMember(fields: Record<string, unknown>): ValidationResult {
-  const errors = checkRequired(fields, ["First Name", "Last Name", "Email", "Membership Status", "Membership Type"]);
+export function validatePerson(fields: Record<string, unknown>): ValidationResult {
+  const errors = checkRequired(fields, ["First Name", "Last Name", "Email"]);
   if (fields["Email"] && typeof fields["Email"] === "string" && !fields["Email"].includes("@")) {
     errors.push("Email must be a valid email address");
   }
@@ -15,36 +15,91 @@ export function validateMember(fields: Record<string, unknown>): ValidationResul
 }
 
 export function validateAthlete(fields: Record<string, unknown>): ValidationResult {
-  const errors = checkRequired(fields, ["Member", "Division", "Age Category", "Gender Category", "Competition Status"]);
+  const errors = checkRequired(fields, ["Name"]);
+  return errors.length ? { valid: false, errors } : { valid: true };
+}
+
+export function validateManager(fields: Record<string, unknown>): ValidationResult {
+  const errors = checkRequired(fields, ["Name"]);
+  return errors.length ? { valid: false, errors } : { valid: true };
+}
+
+export function validateCoach(fields: Record<string, unknown>): ValidationResult {
+  const errors = checkRequired(fields, ["Name"]);
   return errors.length ? { valid: false, errors } : { valid: true };
 }
 
 export function validateClub(fields: Record<string, unknown>): ValidationResult {
-  const errors = checkRequired(fields, ["Club Name", "Affiliation Status"]);
+  const errors = checkRequired(fields, ["Club Name"]);
   return errors.length ? { valid: false, errors } : { valid: true };
 }
 
 export function validateEvent(fields: Record<string, unknown>): ValidationResult {
-  const errors = checkRequired(fields, ["Event Name", "Event Type", "Status"]);
+  const errors = checkRequired(fields, ["Event Name"]);
   return errors.length ? { valid: false, errors } : { valid: true };
 }
 
-export function validateVolunteer(fields: Record<string, unknown>): ValidationResult {
-  const errors = checkRequired(fields, ["Member", "Event", "Role", "Status"]);
+export function validateRsvp(fields: Record<string, unknown>): ValidationResult {
+  const errors = checkRequired(fields, ["Name"]);
   return errors.length ? { valid: false, errors } : { valid: true };
 }
 
 export function validateTechnicalOfficial(fields: Record<string, unknown>): ValidationResult {
-  const errors = checkRequired(fields, ["Member", "Certification Level", "Certification Status"]);
+  const errors = checkRequired(fields, ["Name"]);
   return errors.length ? { valid: false, errors } : { valid: true };
 }
 
 export function validateTOTraining(fields: Record<string, unknown>): ValidationResult {
-  const errors = checkRequired(fields, ["Training Name", "Course Type", "Technical Official", "Result"]);
+  const errors = checkRequired(fields, ["Training Name"]);
   return errors.length ? { valid: false, errors } : { valid: true };
 }
 
-export function validateTOExperience(fields: Record<string, unknown>): ValidationResult {
-  const errors = checkRequired(fields, ["Technical Official", "Event", "Role at Event"]);
+export function validateWorkout(fields: Record<string, unknown>): ValidationResult {
+  const errors = checkRequired(fields, ["Name"]);
+  return errors.length ? { valid: false, errors } : { valid: true };
+}
+
+export function validateNews(fields: Record<string, unknown>): ValidationResult {
+  const errors = checkRequired(fields, ["Title"]);
+  return errors.length ? { valid: false, errors } : { valid: true };
+}
+
+export function validateBoard(fields: Record<string, unknown>): ValidationResult {
+  const errors = checkRequired(fields, ["Name"]);
+  return errors.length ? { valid: false, errors } : { valid: true };
+}
+
+export function validateCommittee(fields: Record<string, unknown>): ValidationResult {
+  const errors = checkRequired(fields, ["Name"]);
+  return errors.length ? { valid: false, errors } : { valid: true };
+}
+
+export function validateResource(fields: Record<string, unknown>): ValidationResult {
+  const errors = checkRequired(fields, ["Name"]);
+  return errors.length ? { valid: false, errors } : { valid: true };
+}
+
+export function validateMembership(fields: Record<string, unknown>): ValidationResult {
+  const errors = checkRequired(fields, ["Name"]);
+  return errors.length ? { valid: false, errors } : { valid: true };
+}
+
+export function validateSurvey(fields: Record<string, unknown>): ValidationResult {
+  const errors = checkRequired(fields, ["Name"]);
+  return errors.length ? { valid: false, errors } : { valid: true };
+}
+
+export function validateStripe(fields: Record<string, unknown>): ValidationResult {
+  const errors = checkRequired(fields, ["Name"]);
+  return errors.length ? { valid: false, errors } : { valid: true };
+}
+
+export function validateInventory(fields: Record<string, unknown>): ValidationResult {
+  const errors = checkRequired(fields, ["Name"]);
+  return errors.length ? { valid: false, errors } : { valid: true };
+}
+
+export function validateCourse(fields: Record<string, unknown>): ValidationResult {
+  const errors = checkRequired(fields, ["Name"]);
   return errors.length ? { valid: false, errors } : { valid: true };
 }
