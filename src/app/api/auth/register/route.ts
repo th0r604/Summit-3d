@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 import { getTable } from "@/lib/airtable";
 
 export async function POST(request: NextRequest) {
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
       "First Name": firstName.trim(),
       "Last Name": lastName.trim(),
       "Email": email.toLowerCase().trim(),
-      "Password": password, // In production, hash this
+      "Password": await bcrypt.hash(password, 12),
       "Role": "member",
     };
 

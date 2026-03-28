@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 import { getTable } from "@/lib/airtable";
 import type { UserRole } from "@/lib/auth-types";
 
@@ -31,8 +32,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const record = records[0];
           const storedPassword = record.get("Password") as string;
 
-          // Simple password check (in production, use bcrypt)
-          if (!storedPassword || storedPassword !== password) return null;
+          if (!storedPassword) return null;
+
+          // Support both bcrypt hashes and plain text (for migration)
+          const isValid = storedPassword.startsWith("$2")
+            ? await bcrypt.compare(password, storedPassword)
+            : storedPassword === password;
+          if (!isValid) return null;
 
           return {
             id: record.id,
