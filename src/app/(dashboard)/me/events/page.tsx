@@ -255,7 +255,7 @@ export default function MyEventsPage() {
       )}
 
       {/* RSVP Modal */}
-      <Modal open={!!rsvpModal} onClose={() => setRsvpModal(null)} title={`RSVP \u2014 ${rsvpModal ? String(rsvpModal.fields["Event Name"] || "Event") : ""}`}>
+      <Modal open={!!rsvpModal} onClose={() => setRsvpModal(null)} title={`RSVP — ${rsvpModal ? String(rsvpModal.fields["Event Name"] || "Event") : ""}`}>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">I am attending as:</label>

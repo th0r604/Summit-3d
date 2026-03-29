@@ -228,13 +228,13 @@ export default function EventDetailPage() {
                         className="rounded"
                       />
                     </td>
-                    <td className="py-3 px-4">{String(a.fields["Name"] || "\u2014")}</td>
+                    <td className="py-3 px-4">{String(a.fields["Name"] || "—")}</td>
                     <td className="py-3 px-4">
                       {a.fields["Role"] ? (
                         <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-xs font-medium">
                           {String(a.fields["Role"])}
                         </span>
-                      ) : "\u2014"}
+                      ) : "—"}
                     </td>
                     <td className="py-3 px-4">
                       <StatusBadge status={String(a.fields["Status"] || a.fields["Attendance Status"] || "Registered")} />

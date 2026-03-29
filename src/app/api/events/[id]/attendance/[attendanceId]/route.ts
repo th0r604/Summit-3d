@@ -34,7 +34,7 @@ export async function PATCH(
           const toTrainingTable = getTable("toTraining");
           await toTrainingTable.create([{
             fields: {
-              "Training Name": `TO Experience \u2014 ${eventName}`,
+              "Training Name": `TO Experience — ${eventName}`,
               "Course Type": "Practical Exam",
               "Date": eventDate || new Date().toISOString().split("T")[0],
               "Technical Official": personIds,

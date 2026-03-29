@@ -164,7 +164,7 @@ export default function EventsPage() {
                 <h3 className="font-medium">{String(event.fields["Event Name"] || "Untitled")}</h3>
                 <p className="text-sm text-gray-500">
                   {event.fields["Event Type"] ? String(event.fields["Event Type"]) : ""}
-                  {event.fields["Start Date"] ? ` \u2014 ${new Date(String(event.fields["Start Date"])).toLocaleDateString()}` : ""}
+                  {event.fields["Start Date"] ? ` — ${new Date(String(event.fields["Start Date"])).toLocaleDateString()}` : ""}
                 </p>
               </div>
               <div className="flex gap-2">
