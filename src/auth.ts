@@ -8,13 +8,21 @@ import type { UserRole } from "@/lib/auth-types";
 const MEMBER_TYPES = ["Athlete", "Technical Official", "Coach"];
 const CLUB_ADMIN_TYPES = ["Club Manager", "Brand Manager"];
 const ADMIN_TYPES = ["Admin"];
-const BLOCKED_TYPES = ["Parent / Guardian / Family", "Other"];
 
-function mapTypeToRole(type: string | undefined): UserRole | null {
-  if (!type || BLOCKED_TYPES.includes(type)) return null;
-  if (ADMIN_TYPES.includes(type)) return "nf_admin";
-  if (CLUB_ADMIN_TYPES.includes(type)) return "club_admin";
-  if (MEMBER_TYPES.includes(type)) return "member";
+function mapTypeToRole(rawType: unknown): UserRole | null {
+  // Handle multi-select (array) or single-select (string)
+  const types: string[] = Array.isArray(rawType)
+    ? rawType
+    : typeof rawType === "string"
+    ? [rawType]
+    : [];
+
+  if (types.length === 0) return null;
+
+  // Highest role wins: Admin > Club Manager > Member
+  if (types.some((t) => ADMIN_TYPES.includes(t))) return "nf_admin";
+  if (types.some((t) => CLUB_ADMIN_TYPES.includes(t))) return "club_admin";
+  if (types.some((t) => MEMBER_TYPES.includes(t))) return "member";
   return null;
 }
 
@@ -54,7 +62,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             : storedPassword === password;
           if (!isValid) return null;
 
-          const role = mapTypeToRole(record.get("Type") as string | undefined);
+          const role = mapTypeToRole(record.get("Type"));
           if (!role) return null; // Type not allowed to log in
 
           return {
