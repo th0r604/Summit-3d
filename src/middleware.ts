@@ -35,6 +35,14 @@ export default auth((req) => {
     }
   }
 
+  // Event management routes (club_admin + nf_admin)
+  const eventAdminRoutes = ["/events"];
+  if (eventAdminRoutes.some((r) => pathname.startsWith(r) && !pathname.startsWith("/me/events"))) {
+    if (role === "member") {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+  }
+
   if (pathname.startsWith("/club")) {
     if (role === "member") {
       return NextResponse.redirect(new URL("/dashboard", req.url));

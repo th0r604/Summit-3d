@@ -103,3 +103,27 @@ export function validateCourse(fields: Record<string, unknown>): ValidationResul
   const errors = checkRequired(fields, ["Name"]);
   return errors.length ? { valid: false, errors } : { valid: true };
 }
+
+export function validateEventCreate(fields: Record<string, unknown>): ValidationResult {
+  const errors = checkRequired(fields, ["Event Name", "Event Type", "Start Date"]);
+  if (fields["End Date"] && fields["Start Date"]) {
+    const start = new Date(String(fields["Start Date"]));
+    const end = new Date(String(fields["End Date"]));
+    if (end < start) {
+      errors.push("End Date must be after Start Date");
+    }
+  }
+  if (fields["Max Participants"] && Number(fields["Max Participants"]) < 1) {
+    errors.push("Max Participants must be a positive number");
+  }
+  return errors.length ? { valid: false, errors } : { valid: true };
+}
+
+export function validateAttendance(fields: Record<string, unknown>): ValidationResult {
+  const errors = checkRequired(fields, ["Event", "Person", "Role"]);
+  const validRoles = ["Athlete", "Technical Official", "Volunteer", "Parent/Guardian"];
+  if (fields["Role"] && !validRoles.includes(String(fields["Role"]))) {
+    errors.push("Role must be one of: " + validRoles.join(", "));
+  }
+  return errors.length ? { valid: false, errors } : { valid: true };
+}
