@@ -18,6 +18,7 @@ const NAV_SECTIONS: NavSection[] = [
       { href: "/me/events", label: "My Events" },
       { href: "/me/certifications", label: "My Certifications" },
       { href: "/me/membership", label: "My Membership" },
+      { href: "/me/events/submit", label: "Submit Event" },
     ],
   },
   {
@@ -49,7 +50,7 @@ const NAV_SECTIONS: NavSection[] = [
     label: "Events & Activities", minRole: "nf_admin",
     items: [
       { href: "/events", label: "Events" },
-      { href: "/rsvp", label: "RSVP" },
+      { href: "/rsvp", label: "Attendance" },
       { href: "/workouts", label: "Workouts" },
       { href: "/courses", label: "Courses" },
     ],
